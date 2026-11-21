@@ -27,6 +27,12 @@ const source = readFileSync(sourcePath);
 if (!written.subarray(0, 8).equals(PNG_MAGIC)) {
   throw new Error("output is not a PNG (bad magic bytes)");
 }
+// The PNG's IHDR chunk (bytes 16-23) carries width and height, big-endian.
+const width = written.readUInt32BE(16);
+const height = written.readUInt32BE(20);
+if (width !== 1024 || height !== 1024) {
+  throw new Error(`output is ${width}x${height}, the gate needs 1024x1024`);
+}
 if (!written.equals(source)) {
   throw new Error("output differs from entry.png");
 }
